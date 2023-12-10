@@ -1,0 +1,167 @@
+{
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "virtualNetworks_az204VNET_name": {
+      "defaultValue": "az204demoVNET",
+      "type": "string"
+    },
+    "networkInterfaces_az204NIC_name": {
+      "defaultValue": "az204demoNIC",
+      "type": "string"
+    },
+    "virtualMachines_az204VMTesting_name": {
+      "defaultValue": "az204demoVM",
+      "type": "string"
+    },
+    "subnets_az204Subnet_name": {
+      "defaultValue": "az204demoSubnet",
+      "type": "string"
+    },
+    "virtualMachines_az204VMTesting_id": {
+      "defaultValue": "[concat(parameters('virtualMachines_az204VMTesting_name'),'_OSDisk1_1')]",
+      "type": "string"
+    },
+    "virtualMachines_adminUser": {
+      "defaultValue": "azureadminuser",
+      "type": "string"
+    },
+    "virtualMachines_adminpassword": {
+      "defaultValue": "Pa$$w0rd",
+      "type": "securestring"
+    }
+  },
+  "variables": {
+    "osDiskName": "_OSDisk1_1_39c654d89d88405e968db84b722002d1"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[parameters('virtualMachines_az204VMTesting_name')]",
+      "apiVersion": "2018-06-01",
+      "location": "westus2",
+      "tags": {},
+      "scale": null,
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "Standard_DS2_v2"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "MicrosoftWindowsServer",
+            "offer": "WindowsServer",
+            "sku": "2012-R2-Datacenter",
+            "version": "latest"
+          },
+          "osDisk": {
+            "osType": "Windows",
+            "name": "[concat(parameters('virtualMachines_az204VMTesting_name'), variables('osDiskName'))]",
+            "createOption": "FromImage",
+            "caching": "ReadWrite"
+          },
+          "dataDisks": []
+        },
+        "osProfile": {
+          "computerName": "[parameters('virtualMachines_az204VMTesting_name')]",
+          "adminUsername": "azureadminuser",
+          "adminPassword": "Pa$$w0rd",
+          "windowsConfiguration": {
+            "provisionVMAgent": true,
+            "enableAutomaticUpdates": true
+          },
+          "secrets": [],
+          "allowExtensionOperations": true
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_az204NIC_name'))]",
+              "properties": {
+                "primary": true
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_az204NIC_name'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[parameters('networkInterfaces_az204NIC_name')]",
+      "apiVersion": "2018-10-01",
+      "location": "westus2",
+      "tags": {},
+      "scale": null,
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "primary",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets',parameters('virtualNetworks_az204VNET_name'),parameters('subnets_az204Subnet_name'))]"
+              },
+              "primary": true,
+              "privateIPAddressVersion": "IPv4"
+            }
+          }
+        ],
+        "dnsSettings": {
+          "dnsServers": [],
+          "appliedDnsServers": []
+        },
+        "enableAcceleratedNetworking": false,
+        "enableIPForwarding": false,
+        "primary": true,
+        "tapConfigurations": []
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_az204VNET_name'), parameters('subnets_az204Subnet_name'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[parameters('virtualNetworks_az204VNET_name')]",
+      "apiVersion": "2018-10-01",
+      "location": "westus2",
+      "tags": {},
+      "scale": null,
+      "properties": {
+        "resourceGuid": "145e7bfc-8b00-48cf-8fa1-082448a30bae",
+        "addressSpace": {
+          "addressPrefixes": [
+            "172.16.0.0/16"
+          ]
+        },
+        "dhcpOptions": {
+          "dnsServers": []
+        },
+        "subnets": [
+          {
+            "name": "[parameters('subnets_az204Subnet_name')]",
+            "properties": {
+              "addressPrefix": "172.16.0.0/24"
+            }
+          }
+        ],
+        "virtualNetworkPeerings": [],
+        "enableDdosProtection": false,
+        "enableVmProtection": false
+      },
+      "dependsOn": []
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks/subnets",
+      "name": "[concat(parameters('virtualNetworks_az204VNET_name'), '/',parameters('subnets_az204Subnet_name'))]",
+      "apiVersion": "2018-10-01",
+      "scale": null,
+      "properties": {
+        "addressPrefix": "172.16.0.0/24"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworks_az204VNET_name'))]"
+      ]
+    }
+  ]
+}

@@ -78,6 +78,8 @@ namespace ConfigureVmRemoteAcess
                 .WithExistingPrimaryNetwork(network)
                 .WithSubnet(subnetName)
                 .WithPrimaryPrivateIPAddressDynamic()
+                .WithExistingPrimaryPublicIPAddress(publicIP)
+                .WithExistingNetworkSecurityGroup(nsg)
                 .Create();
 
             Console.WriteLine($"Creating virtual machine {vmName} ...");

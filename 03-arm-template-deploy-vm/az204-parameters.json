@@ -1,0 +1,27 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "virtualNetworks_az204VNET_name": {
+      "value": "az204demoVNET"
+    },
+    "networkInterfaces_az204NIC_name": {
+      "value": "az204demoNIC"
+    },
+    "virtualMachines_az204VMTesting_name": {
+      "value": "az204demoVM"
+    },
+    "subnets_az204Subnet_name": {
+      "value": "az204demoSubnet"
+    },
+    "virtualMachines_az204VMTesting_id": {
+      "value": "[concat(parameters('virtualMachines_az204VMTesting_name'),'_OSDisk1_1_39c654d89d88405e968db84b722002d1')]"
+    },
+    "virtualMachines_adminUser": {
+      "value": "azureadminuser"
+    },
+    "virtualMachines_adminpassword": {
+      "value": "Pa$$w0rd"
+    }
+  }
+}
